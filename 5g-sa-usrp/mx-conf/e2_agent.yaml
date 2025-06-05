@@ -1,0 +1,26 @@
+#/*
+# Copyright (C) 2021-2025 BubbleRAN SAS
+#
+# E2E 5G O-RAN RIC and xapp
+# Last Changed: 2025-04-25
+# Project: MX-ORS
+# Full License: https://bubbleran.com/resources/files/BubbleRAN_Licence-Agreement-1.3.pdf)
+#*/
+
+e2_agent:
+    ip_ric: 10.23.1.62
+    e2_port: 36421
+    # IP to bind SCTP client
+    # Needs to be in the range of
+    # ip_ric. It is the interface
+    # from ifconfig cmd
+    ip_agent: 10.23.1.64
+    #sm_dir: /opt/hydra/lib/flexric/
+    log: 2
+        # trace: 0
+        # debug: 1
+        # info: 2
+        # warn: 3
+        # error: 4
+        # fatal: 5
+        # e.g., level = 2 -> level = info

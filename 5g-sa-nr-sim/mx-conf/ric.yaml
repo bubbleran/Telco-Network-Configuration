@@ -1,0 +1,24 @@
+#/*
+# Copyright (C) 2021-2025 BubbleRAN SAS
+#
+# E2E 5G O-RAN RIC and xapp
+# Last Changed: 2025-04-25
+# Project: MX-ORS
+# Full License: https://bubbleran.com/resources/files/BubbleRAN_Licence-Agreement-1.3.pdf)
+#*/
+
+nearRT_RIC:
+    ip: 10.23.1.62
+    # Listening E2 agent port
+    e2_port: 36421
+    # Listening xApp port 
+    e42_port: 36422
+    sm_dir: /opt/hydra/lib/flexric/
+    log: 2
+        # trace: 0
+        # debug: 1
+        # info: 2
+        # warn: 3
+        # error: 4
+        # fatal: 5
+        # e.g., level = 2 -> level = info

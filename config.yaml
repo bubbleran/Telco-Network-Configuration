@@ -1,0 +1,62 @@
+########################## Necessary details for deploying the blueprint ##########################
+
+nvidia_api_key: "nvapi-***" # INSERT YOUR KEY HERE
+
+bubbleran_network_setup: "5g-sa-nr-sim" # select the BubbleRAN mode: "5g-sa-nr-sim" for RF-sim mode, or for "5g-sa-usrp" for USRP mode
+
+
+########################## LLM parameters  ##########################
+## Set model endpoints for default API Catalog setup (no GPU needed)
+## Ensure NIM_mode is set to False to use API Catalog
+llm_model: "meta/llama-3.1-70b-instruct"
+llm_base_url: "https://integrate.api.nvidia.com/v1"
+
+## Set these to required parametrs for locally hosted NIM mode
+## Ensure NIM_mode is true for using locally hosted NIMs
+NIM_mode: False
+nim_image: nvcr.io/nim/meta/llama-3.1-70b-instruct:latest # should be of format name:version
+nim_llm_port: 8000 # port where the NIM endpoint is available
+
+## Set the parameters of LLM (for both API catalog endpoints and locally hosted NIMs)
+llm_temp: 0 
+llm_top_p: 0.7
+llm_max_tokens: 1024
+
+
+########################## Network Environment Parameters ##########################
+
+default_p0_nominal_value: -90 # ensure the value belongs to one of the p0_nominal_values below
+p0_nominal_values: [-86, -90, -94, -98] # p0_nominal values supported in this blueprint version
+p0_nominal_WA_weights: [0.6, 0.4] # weights assigned to average value of DL bitrate and SNR
+
+default_dl_carrierBandwidth_value: 51 # ensure the value belongs to one of the dl_carrierBandwidth_values below
+dl_carrierBandwidth_values: [24, 51, 106] # dl_carrierBandwidth values supported in this blueprint version
+dl_carrierBandwidth_WA_weights: [0.6, 0.4] # weights assigned to average value of DL bitrate and SNR
+
+default_ul_carrierBandwidth_value: 51 # ensure the value belongs to one of the ul_carrierBandwidth_values below
+ul_carrierBandwidth_values: [24, 51, 106] # ul_carrierBandwidth values supported in this blueprint version
+ul_carrierBandwidth_WA_weights: [0.6, -0.4] # weights assigned to average value of UL bitrate and SNR
+
+default_att_tx_value: 10 # ensure the value belongs to one of the att_tx_values below
+att_tx_values: [0, 10, 20, 30, 40] # att_tx values supported in this blueprint version
+att_tx_WA_weights: [0.6, 0.4] # weights assigned to average value of DL bitrate and SNR
+
+default_att_rx_value: 10 # ensure the value belongs to one of the att_rx_values below
+att_rx_values: [0, 10, 20, 30, 40] # att_rx values supported in this blueprint version
+att_rx_WA_weights: [0.6, -0.4] # weights assigned to average value of UL bitrate and number of retransmissions requested by the UE (retx)
+
+
+########################## Time periods for monitoring and validation ##########################
+
+monitoring_wait_time: 1 # current monitoring time period in seconds for each parameter, can be changed via UI
+                        # can be any value out of [1, 10, 30, 60]
+
+validation_wait_time: 10 # current validation time period in seconds, can be changed via UI
+                        # can be any value out of [1, 10, 30, 60]
+
+########################## Database paths and details ##########################
+
+persistent_db_path: "./data/persistent_db" # path to persistent database
+historical_db_path: "./data/historical_db" # path to historical database
+table_name: "MAC_UE"
+debugging: True

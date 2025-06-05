@@ -1,0 +1,367 @@
+#/*
+# Copyright (C) 2021-2025 BubbleRAN SAS
+#
+# E2E 5G O-RAN RIC and xapp
+# Last Changed: 2025-04-25
+# Project: MX-ORS
+# Full License: https://bubbleran.com/resources/files/BubbleRAN_Licence-Agreement-1.3.pdf)
+#*/
+
+
+# Command to run
+# - docker compose up -d
+# Command to clear all network and remainding container
+# - docker compose down
+
+services:
+    mysql:
+        container_name: "mysql"
+        image: mysql:8.0
+        volumes:
+            - ./oai-cn/database/oai_db.sql:/docker-entrypoint-initdb.d/oai_db.sql
+            - ./oai-cn/healthscripts/mysql-healthcheck.sh:/tmp/mysql-healthcheck.sh
+        environment:
+            - TZ=Europe/Paris
+            - MYSQL_DATABASE=oai_db
+            - MYSQL_USER=test
+            - MYSQL_PASSWORD=test
+            - MYSQL_ROOT_PASSWORD=linux
+        healthcheck:
+            test: /bin/bash -c "/tmp/mysql-healthcheck.sh"
+            interval: 5s
+            timeout: 2s
+            retries: 10
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.131
+
+    ims:
+        container_name: "ims"
+        image: oaisoftwarealliance/ims:latest
+        volumes:
+            - ./oai-cn/conf/sip.conf:/etc/asterisk/sip.conf
+            - ./oai-cn/conf/users.conf:/etc/asterisk/users.conf
+        healthcheck:
+            test: /bin/bash -c "pgrep asterisk"
+            interval: 5s
+            timeout: 2s
+            retries: 10
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.139
+    oai-udr:
+        container_name: "oai-udr"
+        image: oaisoftwarealliance/oai-udr:develop
+        expose:
+            - 80/tcp
+            - 8080/tcp
+        volumes:
+            - ./oai-cn/conf/config.yaml:/openair-udr/etc/config.yaml
+        environment:
+            - TZ=Europe/Paris
+        depends_on:
+            - mysql
+            - oai-nrf
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.136
+    oai-udm:
+        container_name: "oai-udm"
+        image: oaisoftwarealliance/oai-udm:develop
+        expose:
+            - 80/tcp
+            - 8080/tcp
+        volumes:
+            - ./oai-cn/conf/config.yaml:/openair-udm/etc/config.yaml
+        environment:
+            - TZ=Europe/Paris
+        depends_on:
+            - oai-udr
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.137
+    oai-ausf:
+        container_name: "oai-ausf"
+        image: oaisoftwarealliance/oai-ausf:develop
+        expose:
+            - 80/tcp
+            - 8080/tcp
+        volumes:
+            - ./oai-cn/conf/config.yaml:/openair-ausf/etc/config.yaml
+        environment:
+            - TZ=Europe/Paris
+        depends_on:
+            - oai-udm
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.138
+    oai-nrf:
+        container_name: "oai-nrf"
+        image: oaisoftwarealliance/oai-nrf:develop
+        expose:
+            - 80/tcp
+            - 8080/tcp
+        volumes:
+            - ./oai-cn/conf/config.yaml:/openair-nrf/etc/config.yaml
+        environment:
+            - TZ=Europe/Paris
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.130
+    oai-amf:
+        container_name: "oai-amf"
+        image: oaisoftwarealliance/oai-amf:develop
+        expose:
+            - 80/tcp
+            - 8080/tcp
+            - 38412/sctp
+        volumes:
+            - ./oai-cn/conf/config.yaml:/openair-amf/etc/config.yaml
+        environment:
+            - TZ=Europe/Paris
+        depends_on:
+            - mysql
+            - oai-nrf
+            - oai-ausf
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.132
+    oai-smf:
+        container_name: "oai-smf"
+        image: oaisoftwarealliance/oai-smf:develop
+        expose:
+            - 80/tcp
+            - 8080/tcp
+            - 8805/udp
+        volumes:
+            - ./oai-cn/conf/config.yaml:/openair-smf/etc/config.yaml
+        environment:
+            - TZ=Europe/Paris
+        depends_on:
+            - oai-nrf
+            - oai-amf
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.133
+    oai-upf:
+        container_name: "oai-upf"
+        image: oaisoftwarealliance/oai-upf:develop
+        expose:
+            - 2152/udp
+            - 8805/udp
+        volumes:
+            - ./oai-cn/conf/config.yaml:/openair-upf/etc/config.yaml
+        environment:
+            - TZ=Europe/Paris
+        depends_on:
+            - oai-nrf
+            - oai-smf
+        cap_add:
+            - NET_ADMIN
+            - SYS_ADMIN
+        cap_drop:
+            - ALL
+        privileged: true
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.134
+    oai-ext-dn:
+        privileged: true
+        init: true
+        container_name: oai-ext-dn
+        image: oaisoftwarealliance/trf-gen-cn5g:jammy
+        entrypoint: /bin/bash -c \
+              "ip route add 10.0.0.0/16 via 192.168.70.134 dev eth0; ip route; sleep infinity"
+        command: ["/bin/bash", "-c", "trap : SIGTERM SIGINT; sleep infinity & wait"]
+        healthcheck:
+            test: /bin/bash -c "ip r | grep 10.0.0"
+            interval: 5s
+            timeout: 2s
+            retries: 10
+        networks:
+            public_net:
+                ipv4_address: 192.168.70.135
+
+    mx-ric:
+        container_name: "mx-ric"
+        image: "hub.bubbleran.com/public/mx-ric:v2025.0.0"
+        command:
+            - '/bin/hsh'
+            - '-c'
+            - '/opt/hydra/init install && /opt/hydra/init ric && /opt/hydra/run ric'
+        configs:
+            -   source: ric
+                target: /etc/hydra/conf/ric.yaml
+        environment:
+            MODE: STANDALONE
+        cap_add:
+            - SYS_NICE
+        networks:
+            controllers-network:
+                ipv4_address: 10.23.1.62
+
+    mx-ran:
+        container_name: "mx-ran"
+        depends_on:
+            - mx-ric
+            - oai-amf
+            - oai-ext-dn
+            - oai-upf
+            - oai-smf
+            - oai-nrf
+            - oai-ausf
+            - oai-udm
+            - oai-udr
+            - ims
+            - mysql
+        image: "hub.bubbleran.com/public/mx-ran:v2025.0.0"
+        command:
+            - '/bin/hsh'
+            - '-c'
+            - '/opt/hydra/init install && /opt/hydra/init gnb && /opt/hydra/run gnb'
+        configs:
+            -   source: gnb
+                target: /etc/hydra/conf/gnb.conf  
+            -   source: e2_agent
+                target: /etc/hydra/conf/e2_agent.yaml
+        environment:
+            MODE: STANDALONE
+        cap_add:
+            - SYS_NICE
+            - NET_ADMIN
+            - SYS_RAWIO
+        networks:
+            controllers-network:
+                ipv4_address: 10.23.1.64
+            public_net:
+                ipv4_address: 192.168.70.140
+
+    mx-xapp:
+        container_name: "mx-xapp"
+        depends_on:
+            - mx-ric
+            - mx-ran
+        image: "hub.bubbleran.com/public/mx-xapp:v2025.0.0"
+        command:
+            - '/bin/hsh'
+            - '-c'
+            - |
+              # Install SQLite (in case it's not available)
+              apt-get update && apt-get install -y sqlite3
+
+              # Initialize SQLite database
+              sqlite3 /root/db/users.db <<EOF
+              CREATE TABLE IF NOT EXISTS users (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  username TEXT UNIQUE NOT NULL,
+                  password TEXT NOT NULL
+              );
+              INSERT OR IGNORE INTO users (username, password) VALUES ('xapp', 'bubbleran');
+              EOF
+
+              # Run the original xApp command
+              sleep 15 && /opt/hydra/init install && /opt/hydra/init c-xapp && /opt/hydra/run c-xapp mon-custom
+        configs:
+            -   source: xapp 
+                target: /etc/hydra/conf/xapp.yaml  
+        volumes:
+            -   ./sqlite3/data:/root/db   # Mount shared volume for the database
+        environment:
+            MODE: STANDALONE
+        networks:
+            controllers-network:
+                ipv4_address: 10.23.1.63
+    # mx-ue:
+    #     container_name: "mx-ue"
+    #     depends_on:
+    #         - mx-ric
+    #         - mx-ran
+    #         - mx-xapp
+    #     image: "hub.bubbleran.com/public/mx-ue:v2025.0.0"
+    #     command:
+    #         - '/bin/hsh'
+    #         - '-c'
+    #         - 'sleep 10 && /opt/hydra/init install && /opt/hydra/init nr-rfsim && /opt/hydra/run nr-rfsim'
+    #     configs:
+    #         -   source: ue 
+    #             target: /etc/hydra/conf/nr-rfsim.conf
+    #         -   source: udhcpc 
+    #             target: /etc/hydra/conf/udhcpc.sh
+    #     hostname: ubuntu
+    #     init: true
+    #     environment:
+    #         MODE: STANDALONE
+    #     cap_add:
+    #         - SYS_NICE
+    #         - NET_ADMIN
+    #         - SYS_RAWIO
+    #     volumes:
+    #         - /dev/bus/usb:/dev/bus/usb
+    #         - /dev/net/tun:/dev/net/tun
+    #     networks:
+    #         controllers-network:
+    #             ipv4_address: 10.23.1.65
+    mx-ue:
+        container_name: "mx-ue"
+        depends_on:
+            - mx-ric
+            - mx-ran
+            - mx-xapp
+        image: "hub.bubbleran.com/public/mx-ue:v2025.0.0"
+        command:
+            - '/bin/hsh'
+            - '-c'
+            - 'sleep 10 && echo "/opt/hydra/usr/lib" > /etc/ld.so.conf.d/iperf3.conf && ldconfig && /opt/hydra/init install && /opt/hydra/init nr-rfsim && /opt/hydra/run nr-rfsim'
+        configs:
+            -   source: ue 
+                target: /etc/hydra/conf/nr-rfsim.conf
+            -   source: udhcpc 
+                target: /etc/hydra/conf/udhcpc.sh
+        hostname: ubuntu
+        init: true
+        environment:
+            MODE: STANDALONE
+        cap_add:
+            - SYS_NICE
+            - NET_ADMIN
+            - SYS_RAWIO
+        volumes:
+            - /dev/bus/usb:/dev/bus/usb
+            - /dev/net/tun:/dev/net/tun
+        networks:
+            controllers-network:
+                ipv4_address: 10.23.1.65
+networks:
+    controllers-network:
+        driver: bridge
+        name: controllers-network
+        driver_opts:
+            com.docker.network.bridge.name: ctrl
+            com.docker.network.container_iface_prefix: ctrl
+        ipam:
+            driver: default
+            config:
+                -   subnet: 10.23.0.0/16
+                    gateway: 10.23.0.1
+    public_net:
+        driver: bridge
+        name: oai-cn5g-public-net
+        ipam:
+            config:
+                - subnet: 192.168.70.128/26
+        driver_opts:
+            com.docker.network.bridge.name: "oai-cn5g"
+    
+configs:
+    gnb:
+        file: ./mx-conf/gnb.conf
+    ric:
+        file: ./mx-conf/ric.yaml
+    xapp:
+        file: ./mx-conf/xapp.yaml
+    e2_agent:
+        file: ./mx-conf/e2_agent.yaml
+    ue:
+        file: ./mx-conf/nr-rfsim.conf
+    udhcpc:
+        file: ./mx-conf/udhcpc.sh

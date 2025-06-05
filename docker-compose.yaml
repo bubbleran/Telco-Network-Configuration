@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  telco_ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUBBLERAN_HOST_PWD: ${PWD}
+    ports:
+      - "8501:8501"
+    environment:
+      - NGC_API_KEY=${NGC_API_KEY}
+      - BUBBLERAN_HOST_PWD=${PWD}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PWD}/agentic_llm_workflow:/workspace/agentic_llm_workflow
+      - ${PWD}/5g-sa-nr-sim:/workspace/5g-sa-nr-sim
+      - ${PWD}/5g-sa-usrp:/workspace/5g-sa-usrp 
+      - ${PWD}/telco_planner_ui.py:/workspace/telco_planner_ui.py
+      - ${PWD}/config.yaml:/workspace/config.yaml
+      - ${PWD}/data:/workspace/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  
+    privileged: true 
+    deploy:
+      resources:
+        limits:
+          memory: 20G 
+

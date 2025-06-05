@@ -1,0 +1,6 @@
+langchain==0.3.25
+langchain-community==0.3.23
+langchain-core==0.3.58
+langchain-nvidia-ai-endpoints==0.3.10
+langgraph==0.4.1
+streamlit==1.45.0
