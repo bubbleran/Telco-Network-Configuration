@@ -484,6 +484,10 @@ Thank you for helping improve and spread this project!
 
 Please refer to [blueprint license](./LICENSE.md) and [BubbleRAN license](./LICENSE_BubbleRAN.md) for details.
 
+## Disclaimer
+
+*This Telco Network Configuration Blueprint is shared as reference and is provided "as is". The security in the production environment is the responsibility of the end users deploying it. When deploying in a production environment, please have security experts review any potential risks and threats; define the trust boundaries, implement logging and monitoring capabilities, secure the communication channels, integrate AuthN & AuthZ with appropriate access controls, keep the deployment up to date, ensure the containers/source code are secure and free of known vulnerabilities. It downloads and uses the 3rd party containers for 5G Core Network from OpenAirInterface. The end users must use the latest and most stable version of the software.*
+
 ## Contributors 
 
 1. [Swastika Dutta](https://www.linkedin.com/in/swastika-dutta/), Solution Architect NVIDIA
