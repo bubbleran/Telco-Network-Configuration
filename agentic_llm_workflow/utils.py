@@ -89,12 +89,16 @@ def start_network():
             yield("(2/3) Connecting to User Equipment... ")
             print("Connecting to User Equipment... ")
 
+            cleanup_command = "docker exec mx-ue pkill iperf3"
+            subprocess.run(cleanup_command, shell=True)
+
             # Prepare command to start the iperf3 server inside the 'mx-ue' container
             start_server_command = (
                     "docker exec mx-ue sh -c "
                     "'LD_LIBRARY_PATH=/opt/hydra/usr/lib:/opt/hydra/usr/lib/x86_64-linux-gnu "
                     "/opt/hydra/usr/bin/iperf3 -s 10.0.0.2'"
                 )
+
             subprocess.Popen(
                     start_server_command,
                     cwd=docker_dir,

@@ -260,14 +260,15 @@ def monitoring_agent(state: State) -> State:
         yield "Aggregating data based on current value..."
 
         # Build SQL query prompt
+
         prompt = f''' Your task is to create a SQL query, execute it using the execute_xapp_sql tool EXACTLY ONCE, and return the resulting answer dataframe. \
             Do not make multiple calls to the tool. 
-            There is a table called "{config['table_name']}" with columns "tstamp", "pusch_snr", "ul_carrierBandwidth", "ul_aggr_tbs".
+            There is a table called "{config['table_name']}" with columns "tstamp", "dl_harq_round1", "dl_harq_round2", "dl_harq_round3", "ul_carrierBandwidth", "ul_aggr_tbs".
             Write the SQL query which does the following:
             1. Makes another new column called "bitrate_ul", such that bitrate_ul[i] = max(0, (1000* (ul_aggr_tbs[i]-ul_aggr_tbs[i-1]))/(tstamp[i]-tstamp[i-1]))
-            2. Makes a new column called "snr", such that snr[i] = pusch_snr[i]
-            3. Finds the average of "bitrate_ul" and "snr" ,for these values of "ul_carrierBandwidth" : {ul_carrierBandwidth_current} 
-            The SQL query should return me these columns in this order: "ul_carrierBandwidth","Average_of_bitrate_ul", "Average_of_snr". 
+            2. Makes a new column called "retx", such that retx[i] = max(0, (1000*(dl_harq_round0[i] + dl_harq_round1[i] + dl_harq_round2[i] + dl_harq_round3[i] - dl_harq_round0[i-1] - dl_harq_round1[i-1] - dl_harq_round2[i-1] - dl_harq_round3[i-1] ))/ (tstamp[i]-tstamp[i-1]))
+            3. Finds the average of "bitrate_ul" and "retx" ,for these values of "ul_carrierBandwidth" : {ul_carrierBandwidth_current}
+            The SQL query should return me these columns in this order: "ul_carrierBandwidth","Average_of_bitrate_ul", "Average_of_retx". 
             You should only print the dataframe, with column names, received from the execute_xapp_sql tool in following format: "data_frame : ,explanation: "'''
 
         # Invoke LLM agent
@@ -442,23 +443,7 @@ def config_agent(state: State) -> State:
     config = yaml.safe_load(open('config.yaml', 'r'))
 
     # Compose the initial prompt to classify the user query into a network parameter category
-    # prompt0 = f'''You are given a list of TOPICS and a USER QUERY below. 
-    # Your job is to respond to the user query based on given RULES. Your answer should consist of Reason, followed by Topic.
-    
-    # TOPIC: [p0_nominal, dl_carrierBandwidth, ul_carrierBandwidth, att_tx, att_rx, Others].
-    
-    # USER QUERY: {user_query}
 
-    # Answer the user query based on these RULES strictly:
-    # 1. If the user asks what is the current value of a given parameter from the list, call the `find_value_in_gnb` to answer what is the value of the parameter. Make sure to say Topic: Others.
-    # 2. If the user wants to find the optimal value of a given parameter, say for example, p0_nominal, ONLY then you should answer "Topic: p0_nominal", or "Topic: att_tx", and so on.
-    # 3. If the user asks anything outside topic, answer politely and tell you can only handle queries about the network and return "Other" as the query topic.
-    
-    # Output structure should be strictly as follows:
-    # Reason:
-    # Topic: detected_TOPIC
-    
-    # Reason step by step before answering.'''
     prompt0 = f'''
     You will receive a USER QUERY and a list of PARAMETERS. 
     Your task is to classify the query into the correct topic, following the \
@@ -773,15 +758,15 @@ def config_agent(state: State) -> State:
             raise ValueError(error_message.strip())
 
         try:
-            # Prompt the agent to construct and execute SQL query on historical database
+
             prompt2 = f''' Your task is to create a SQL query, execute it using the execute_historical_sql tool to get the proper result dataframe, and return the resulting answer dataframe. \
             If you get error, make another call with proper SQL to the tool to get proper answer.
-            There is a table called "kpis" with columns "Parameter", "Value", "snr", "bitrate_UL". \
+            There is a table called "kpis" with columns "Parameter", "Value", "retx", "bitrate_UL". 
             Write an SQL query which does the following:
                 1. Filter rows where "Parameter" value is "UL_Number of Physical Resource Blocks (PRBs)".
-                2. Find average of "bitrate_UL" and "snr", FOR EACH of these distinct "Value" separately: {config['ul_carrierBandwidth_values']}
-            The SQL query should return me these columns in the given order: "ul_carrierBandwidth", "Average_of_bitrate_UL", "Average_of_snr". 
-            Also add filter to remove the rows where "snr" and "bitrate_UL" values are 0. \
+                2. Find average of "bitrate_UL" and "retx", FOR EACH of these distinct "Value" separately: {config['ul_carrierBandwidth_values']}
+            The SQL query should return me these columns in the given order: "ul_carrierBandwidth", "Average_of_bitrate_UL", "Average_of_retx". 
+            Also add filter to remove the rows where "retx" and "bitrate_UL" values are 0. 
             You should only print the dataframe, with column names, received from the execute_historical_sql tool in following format: "data_frame : ,explanation: "
             If your first call gets error, make sure to rerun with full SQL again to get proper response from the SQL Query.'''
 
@@ -823,7 +808,7 @@ def config_agent(state: State) -> State:
         
         try:
             # Generate the final recommendation based on the weighted average table
-            prompt4 = f'''The table contains the following columns: [Change in ul_carrierBandwidth, % increase in snr (sound noise ratio), % increase Bit Rate, Weighted Average Gain]. Use only the data in the table to answer questions. Do not guess or provide information beyond the table.
+            prompt4 = f'''The table contains the following columns: [Change in ul_carrierBandwidth, % increase in retx (number of retransmissions), % increase Bit Rate, Weighted Average Gain]. Use only the data in the table to answer questions. Do not guess or provide information beyond the table.
 
             "Change in ul_carrierBandwidth" column shows the potential change of ul_carrierBandwidth value. Example: "-106 to -102" means if they value is changed from -106 to -102, the wieghted average gain is given in the corresponding row.
             
@@ -837,7 +822,7 @@ def config_agent(state: State) -> State:
             Instructions for answering:
             1. The final call on which ul_carrierBandwidth value or which change in ul_carrierBandwidth value is preferable is determined by whose 'Weighted Average Gain' value is the **greatest**.
             2. Refer to the table explicitly for your answer. Think step by step before answering. First think the reason, and then give the answer.
-            3. The '% increase in Sound Noise Ratio (SNR)' increase causes UL interference, and is given weight {weight2} to calculate the weighted average gain.
+            3. The % increase in retx' increase causes UL interference, and is given weight {weight2} to calculate the weighted average gain.
             4. The '% increase Bit Rate' is favoured and given a weight of {weight1} in the weighted average gain.
             5. Negative Weighted Average Gain suggest that the ul_carrierBandwidth change is **not** recommended. If all changes (like -106 to -102, and so on) result in negative Weighted Average Gains, inform the user that no change is needed.
 
@@ -848,8 +833,8 @@ def config_agent(state: State) -> State:
             Here is a sample response:
             "There are currently 5 different values configured in the data available to me for ul_carrierBandwidth. \
             Considering the KPIs resulting from these values, the optimal value is X. \
-            There are two main KPIs used in the decision making process. The bitrate and SNR. \
-            As the SNR increase causes UL interference, the tradeoff between SNR increase and \
+            There are two main KPIs used in the decision making process. The bitrate and retx. \
+            As the retx increase causes UL interference, the tradeoff between retx increase and \
             itrate increase is calculated with Weighted average method and the best performing value compared to the current P0 nominal value, is -84."
             '''
 
@@ -909,6 +894,7 @@ def config_agent(state: State) -> State:
             You should only print the dataframe, with column names, received from the execute_historical_sql tool in following format: "data_frame : ,explanation: "
             If your first call gets error, make sure to rerun with full SQL again to get proper response from the SQL Query.'''
 
+            
             llm_response = llm_agent.invoke({"messages": prompt2})
             average_kpis_df = llm_response["messages"][-2].content if hasattr(llm_response["messages"][-1], "content") else None
         except Exception as e:
@@ -1070,7 +1056,7 @@ def config_agent(state: State) -> State:
         
         try:        
             # Generate the final recommendation based on the weighted average table
-            prompt4 = f'''The table contains the following columns: [Change in att_rx, % increase in snr (sound noise ratio), % increase Bit Rate, Weighted Average Gain]. Use only the data in the table to answer questions. Do not guess or provide information beyond the table.
+            prompt4 = f'''The table contains the following columns: [Change in att_rx, % increase in retx (number of retransmissions), % increase Bit Rate, Weighted Average Gain]. Use only the data in the table to answer questions. Do not guess or provide information beyond the table.
 
             "Change in att_rx" column shows the potential change of att_rx value. Example: "-106 to -102" means if they value is changed from -106 to -102, the wieghted average gain is given in the corresponding row.
             
@@ -1084,7 +1070,7 @@ def config_agent(state: State) -> State:
             Instructions for answering:
             1. The final call on which att_rx value or which change in att_rx value is preferable is determined by whose 'Weighted Average Gain' value is the **greatest**.
             2. Refer to the table explicitly for your answer. Think step by step before answering. First think the reason, and then give the answer.
-            3. The '% increase in Sound Noise Ratio (SNR)' increase causes UL interference, and is given weight {weight2} to calculate the weighted average gain.
+            3. The '% increase in retx' increase causes UL interference, and is given weight {weight2} to calculate the weighted average gain.
             4. The '% increase Bit Rate' is favoured and given a weight of {weight1} in the weighted average gain.
             5. Negative Weighted Average Gain suggest that the att_rx change is **not** recommended. If all changes (like -106 to -102, and so on) result in negative Weighted Average Gains, inform the user that no change is needed.
 
@@ -1095,8 +1081,8 @@ def config_agent(state: State) -> State:
             Here is a sample response:
             "There are currently 5 different values configured in the data available to me for att_rx. \
             Considering the KPIs resulting from these values, the optimal value is X. \
-            There are two main KPIs used in the decision making process. The bitrate and SNR. \
-            As the SNR increase causes UL interference, the tradeoff between SNR increase and \
+            There are two main KPIs used in the decision making process. The bitrate and retx. \
+            As the retx increase causes UL interference, the tradeoff between retx increase and \
             bitrate increase is calculated with Weighted average method and the best performing value compared to the current P0 nominal value, is -84."
             '''
 
@@ -1379,16 +1365,16 @@ def valid_agent(state: State) -> State:
             update_value_in_db(state["vars_new"])
 
             # Prompt the LLM to generate a SQL query for aggregating KPI data
+
             prompt2 = f''' Your task is to create a SQL query, execute it using the execute_xapp_sql tool EXACTLY ONCE, and return the resulting answer dataframe. \
             Do not make multiple calls to the tool. 
-            There is a table called "{yaml.safe_load(open('config.yaml', 'r'))['table_name']}" with columns "tstamp", "pusch_snr", "ul_carrierBandwidth", "ul_aggr_tbs".
+            There is a table called "{yaml.safe_load(open('config.yaml', 'r'))['table_name']}" with columns "tstamp", "dl_harq_round0", "dl_harq_round1", "dl_harq_round2", "dl_harq_round3", "ul_carrierBandwidth", "ul_aggr_tbs".
             Write the SQL query which does the following:
             1. Makes another new column called "bitrate_ul", such that bitrate_ul[i] = max(0, (1000* (ul_aggr_tbs[i]-ul_aggr_tbs[i-1]))/(tstamp[i]-tstamp[i-1]))
-            2. Makes a new column called "snr", such that snr[i] = pusch_snr[i]
-            3. Finds the average of "bitrate_ul" and "snr" ,for these values of "ul_carrierBandwidth" : {state["vars_new"]["ul_carrierBandwidth"]}, {state["vars_current"]["ul_carrierBandwidth"]}
-            The SQL query should return me these columns in this order: "ul_carrierBandwidth","Average_of_bitrate_ul", "Average_of_snr". 
+            2.  Makes a new column called "retx", such that retx[i] = (1000*(dl_harq_round0[i] + dl_harq_round1[i] + dl_harq_round2[i] + dl_harq_round3[i] - dl_harq_round0[i-1] - dl_harq_round1[i-1] - dl_harq_round2[i-1] - dl_harq_round3[i-1]) )/ (tstamp[i]-tstamp[i-1])
+            3. Finds the average of "bitrate_ul" and "retx" ,for these values of "ul_carrierBandwidth" : {state["vars_new"]["ul_carrierBandwidth"]}, {state["vars_current"]["ul_carrierBandwidth"]}
+            The SQL query should return me these columns in this order: "ul_carrierBandwidth","Average_of_bitrate_ul", "Average_of_retx". 
             You should only print the dataframe, with column names, received from the execute_xapp_sql tool in following format: "data_frame : ,explanation: "'''
-
 
             llm_response = llm_agent.invoke({"messages": prompt2})
             average_kpis_df = llm_response["messages"][-2].content if hasattr(llm_response["messages"][-1], "content") else None
