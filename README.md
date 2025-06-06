@@ -484,6 +484,12 @@ Thank you for helping improve and spread this project!
 
 Please refer to [blueprint license](./LICENSE.md) and [BubbleRAN license](./LICENSE_BubbleRAN.md) for details.
 
+## Contributors 
 
-
-
+1. [Swastika Dutta](https://www.linkedin.com/in/swastika-dutta/), Solution Architect NVIDIA
+2. [Ari Uskudar](https://www.linkedin.com/in/ari-u-628b30148/), Product Manager, NVIDIA.
+3. [Maria Amparo Canaveras Galdon](https://www.linkedin.com/in/amparo-canaveras-b2152522/), Senior Solution Architect, NVIDIA
+4. [Spencer Gawe](https://www.linkedin.com/in/spencer-gawe-dr-40931a13/), Soultion Architect, NVIDIA
+5. [Mikel Irazabal](https://www.linkedin.com/in/mikel-irazabal-41777a46/), Principle Engineer, BubbleRAN
+6. [Khai Duc Nguyen](https://www.linkedin.com/in/khaidnguyen11/), O-RAN Engineer, BubbleRAN
+7. [Ali Yagoubian](https://www.linkedin.com/in/ali-yaghoubian/), Ph.D. Student, Eurecom
