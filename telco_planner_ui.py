@@ -473,7 +473,7 @@ def summarize_config_output(output_dict):
         
                 col1, col2 = st.columns([0.90, 0.10])
                 with col1:
-                    st.markdown(f"**KPI Delta Comparison Table:**")
+                    st.markdown(f"**KPI Comparison Table:**")
                 with col2:
                     with st.popover("ⓘ", use_container_width=True):
                         st.markdown(f"<div style='font-size: 14px;'>You can select the desired {var} value directly via the UI,<br>based on your preferred KPI trade-offs shown in this table.</div>",
@@ -484,7 +484,7 @@ def summarize_config_output(output_dict):
                 <div style="{container_style}">
                     <ul>
                         <li><strong>Weighted KPI Trade-off Calculation:</strong>  
-                            I use a weighted average to combine the average increase in <strong>{map_kpis.get(kpi1)}</strong> and the corresponding change in <strong>{map_kpis.get(kpi2)}</strong>.  
+                            I use a weighted average to combine the average change in <strong>{map_kpis.get(kpi1)}</strong> and the corresponding change in <strong>{map_kpis.get(kpi2)}</strong>.  
                             I am using the values given in the <code>config.yaml</code> file to assign weights {yaml.safe_load(open('config.yaml', 'r'))[f'{var}_WA_weights'][0]} and {yaml.safe_load(open('config.yaml', 'r'))[f'{var}_WA_weights'][1]} to the two KPIs respectively.
                         </li>
                     </ul>
