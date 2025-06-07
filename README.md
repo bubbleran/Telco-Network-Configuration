@@ -6,7 +6,7 @@
 
 In a telecom network, configuration and optimization involve managing a complex set of interdependent parameters such as TDD patterns, tx/rx gain, scheduling algorithms, MCS selection, handover thresholds, and power control — all of which directly affect network performance, user experience, and spectrum efficiency. These parameters must be continuously tuned in response to changing conditions like time of day, user mobility, traffic patterns, interference, and service types.
 
-NVIDIA has developed an **agentic AI blueprint**, built on the top of the BubbleRAN 5G O-RAN network, to bring autonomy into dynamic wireless environment. By observing real-time statistics (like SNR, MCS, LDPC decoder iterations) and the resulted KPIs (such as DL/UL bitrate), the agents can making data-driven decisions and automatically adjusting configuration parameters. Unlike traditional rule-based SON, this agentic AI solution is capable of reasoning through complex trade-offs (e.g., higher downlink bitrate vs. SNR degradation), learning from feedback loops[*](#upcoming-features), and adapting to evolving conditions—either autonomously, without human intervention, or with manual oversight, depending on the use case.
+NVIDIA has developed an **agentic AI blueprint**, built on the top of the BubbleRAN 5G O-RAN network, to bring autonomy into dynamic wireless environment. By observing real-time statistics (e.g., SNR, MCS or LDPC decoder iterations) and the resulting KPIs (such as DL/UL bitrate), the agents can make data-driven decisions and automatically adjust the configuration parameters. Unlike traditional rule-based SON, this agentic AI solution is capable of reasoning through complex trade-offs (e.g., higher downlink bitrate vs. SNR degradation), learning from feedback loops[*](#upcoming-features), and adapting to evolving conditions—either autonomously, without human intervention, or with manual oversight, depending on the use case.
 
 
 
@@ -57,7 +57,7 @@ For more details on the agentic workflow, please refer to [this documentation](.
 
 * **RAN Operators:** Utilize the framework to optimize network performance efficiently. 
 
-* **Network Engineers/Installers:** Reduced manual effort and data-driven configuration recommendations. 
+* **Network Engineers/Installers:** Reduce manual effort and get data-driven configuration recommendations. 
 
 * **Telecom Companies:** Improve network performance and customer satisfaction. Extend this use case for additional Telco-related services. 
 
@@ -85,9 +85,9 @@ The deployment file features MX-5G, comprising the Core Network and Radio Access
 
 We provide two Docker Compose configurations to suit different needs: 
 * **Simulation Environment (RF-Sim mode):** This setup simulates 5G user equipment (e.g., smartphones) connecting to the MX-5G network, ideal for development and testing. 
-* **Over-the-Air Environment using USRP (USRP mode):** This mode allows the actual user equipment, such as 5G mobile phones or Quectel modules, to establish an over-the-air (wireless) connections with the  MX-5G. Please note that this option necessitates coordination with BubbleRAN for environment provisioning due to the requirement of radio hardware (e.g. USRPs or O-RAN 7.2 RU) and specific modules. 
+* **Over-the-Air Environment using USRP (USRP mode):** This mode allows the actual user equipment, such as 5G mobile phones or Quectel modules, to establish an over-the-air (wireless) connections with the  MX-5G. Please note that this option necessitates coordination with BubbleRAN for environment provisioning due to the requirement of radio hardware (e.g., USRPs or O-RAN 7.2 RU) and specific modules. 
 
-For more [detailed explanation on BubbleRAN environment](https://hackmd.io/@cqJBhbgpTAaFyWlljbNPQQ/HyLxO-Ylge), please refer to the respective README file in the two directories named [5g-sa-nr-sim](./5g-sa-nr-sim/README.md) and [5g-sa-usrp](./5g-sa-usrp/README.md).   
+For more [detailed explanation of the BubbleRAN environment](https://hackmd.io/@cqJBhbgpTAaFyWlljbNPQQ/HyLxO-Ylge), please refer to the respective README file in the two directories named [5g-sa-nr-sim](./5g-sa-nr-sim/README.md) and [5g-sa-usrp](./5g-sa-usrp/README.md).   
 
 In our blueprint, you can start and stop the network via the User Interface. The [Quickstart guide](#quickstart-guide) section lists the steps to setup the blueprint. 
 
@@ -115,7 +115,7 @@ docker compose --file docker-compose.yaml up –d
 [NR_MAC]   Frame.Slot 512.0 
 ```
 
-Now you can connect the mobile phone. 
+You can now connect the mobile phone. 
 
 **Stop network:** To stop the container, run this command:  
 
@@ -128,7 +128,7 @@ For more information about the BubbleRAN turnkey 5G O-RAN solutions, please refe
 
 ## Requirements
 
-Before deploying this blueprint, ensure your system meets the requirements for both the Agentic LLM Workflow and the BubbleRAN Environment.
+Before deploying this blueprint, ensure that your system meets the requirements for both the Agentic LLM Workflow and the BubbleRAN Environment.
 
 
 ### Agentic LLM Workflow Requirements
@@ -150,12 +150,12 @@ Before deploying this blueprint, ensure your system meets the requirements for b
 
 
 ### BubbleRAN Environment Requirements
-* CPU: 12+ cores @ 3,8 GHz, AVX-512 is a necessary
+* CPU: 12+ cores @ 3,8 GHz, AVX-512 is necessary
 * RAM: 32 GB
 * OS: Modern Linux (e.g., Ubuntu 22.04)
 * Docker & Docker Compose (latest stable)
 
-This environment has been extensively tested on an AMD Ryzen 9 9950X 16-Core Processor. However, any system meeting the above requirements should be sufficient.
+This blueprint has been extensively tested on an AMD Ryzen 9 9950X 16-Core Processor. However, any system meeting the above requirements should be sufficient.
 
 You do not need any additional requirements to deploy in **RF-Sim** mode. However, to deploy BubbleRAN in **USRP mode**, the following additional hardware and configuration settings are required:
 
@@ -227,10 +227,9 @@ To **deploy locally hosted NIMs** for Llama 3.1 70B Instruct, please follow the 
 
 ### Step 2: Setup the blueprint repository
 
-TODO: Update with partner's public repo link
 Clone this repository in your system and navigate to the root of the directory:
 ```bash 
-git clone https://<github_link>
+git clone https://bubbleran.com/Telco-Network-Configuration
 ```
 
 Setup the following values in the `config.yaml` file:
@@ -454,7 +453,7 @@ In the OAI configuration, tx_gain and rx_gain are not set directly. Instead, OAI
 For the USRP B210 we’re using, the maximum TX gain is approximately 90, and the maximum RX gain is approximately 70. So:
 When we set att_tx = 0 and att_rx = 0, the actual tx_gain and rx_gain are 90 and 70, respectively.
 When we set them to 10, the actual tx_gain and rx_gain become 80 and 60, respectively. 
-So the formula is: [Tx_gain = 90 - tx_att] and [Rx_gain = 70 - att_rx] for USRP B210.
+So the formula is: [Tx_gain = 90 - att_tx] and [Rx_gain = 70 - att_rx] for USRP B210.
 The original (historical) data is based on gain values, subtract those from 90 or 70, respectively, to get the corresponding attenuation values.
 
 ## Important Links
@@ -486,14 +485,14 @@ Please refer to [blueprint license](./LICENSE.md) and [BubbleRAN license](./LICE
 
 ## Disclaimer
 
-*This Telco Network Configuration Blueprint is shared as reference and is provided "as is". The security in the production environment is the responsibility of the end users deploying it. When deploying in a production environment, please have security experts review any potential risks and threats; define the trust boundaries, implement logging and monitoring capabilities, secure the communication channels, integrate AuthN & AuthZ with appropriate access controls, keep the deployment up to date, ensure the containers/source code are secure and free of known vulnerabilities. It downloads and uses the 3rd party containers for 5G Core Network from OpenAirInterface. The end users must use the latest and most stable version of the software.*
+*This Telco Network Configuration Blueprint is shared as reference and is provided "as is". The security in the production environment is the responsibility of the end users deploying it. When deploying in a production environment, please have security experts review any potential risks and threats; define the trust boundaries, implement logging and monitoring capabilities, secure the communication channels, integrate AuthN & AuthZ with appropriate access controls, keep the deployment up to date, ensure the containers/source code are secure and free of known vulnerabilities. This blueprint downloads and uses 3rd party containers for 5G Core Network from OpenAirInterface. The end users must use the latest and most stable version of the software.*
 
 ## Contributors 
 
 1. [Swastika Dutta](https://www.linkedin.com/in/swastika-dutta/), Solution Architect NVIDIA
 2. [Ari Uskudar](https://www.linkedin.com/in/ari-u-628b30148/), Product Manager, NVIDIA.
 3. [Maria Amparo Canaveras Galdon](https://www.linkedin.com/in/amparo-canaveras-b2152522/), Senior Solution Architect, NVIDIA
-4. [Spencer Gawe](https://www.linkedin.com/in/spencer-gawe-dr-40931a13/), Soultion Architect, NVIDIA
-5. [Mikel Irazabal](https://www.linkedin.com/in/mikel-irazabal-41777a46/), Principle Engineer, BubbleRAN
+4. [Spencer Gawe](https://www.linkedin.com/in/spencer-gawe-dr-40931a13/), Solution Architect, NVIDIA
+5. [Mikel Irazabal](https://www.linkedin.com/in/mikel-irazabal-41777a46/), Principal Engineer, BubbleRAN
 6. [Khai Duc Nguyen](https://www.linkedin.com/in/khaidnguyen11/), O-RAN Engineer, BubbleRAN
 7. [Ali Yagoubian](https://www.linkedin.com/in/ali-yaghoubian/), Ph.D. Student, Eurecom
