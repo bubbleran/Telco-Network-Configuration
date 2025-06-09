@@ -23,7 +23,7 @@ The agents can also orchestrate changes across multiple layers (from PHY/MAC to 
 - [System Requirements](#requirements)
 - [Directory structure](#directory-structure)
 - [Quickstart guide](#quickstart-guide)
-  - [Obtain NVIDIA API key](#step-1-obtain-your-nvidia-api-key)
+  - [Obtain NVIDIA API key](#step-1-obtain-your-nvidia-api-key-and-access-nvidia-nim)
   - [Setup the blueprint repository](#step-2-setup-the-blueprint-repository)
   - [Deploy the application](#step-3-deploy-the-application)
 - [Example Walkthrough after UI Launch](#example-walkthrough-after-ui-launch-configuration-validation-and-monitoring)
@@ -31,7 +31,6 @@ The agents can also orchestrate changes across multiple layers (from PHY/MAC to 
 - [Known issues and troubleshooting](#known-issues-and-troubleshooting)
 - [Terminology](#terminology)
 - [Important Links](#important-links)
-- [Inviting the community to contribute](#inviting-the-community-to-contribute)
 - [License](#license)
 
 
@@ -229,6 +228,7 @@ To **deploy locally hosted NIMs** for Llama 3.1 70B Instruct, please follow the 
 Clone this repository in your system and navigate to the root of the directory:
 ```bash 
 git clone https://github.com/bubbleran/Telco-Network-Configuration.git
+cd Telco-Network-Configuration
 ```
 
 Setup the following values in the `config.yaml` file:
@@ -256,13 +256,13 @@ You can deploy the UI using any of the following methods:
 
 **Option 1: Bare Metal (Python Virtualenv)**
 
-Create and activate python virtual environment
+Create and activate python virtual environment:
 ```bash
 pip install virtualenv 	## if you don't already have virtualenv installed
 python3.10 -m virtualenv bp_env
 source bp_env/bin/activate
 ```
-Go to the root directory of the repository, and install the requirements in the virtual environment.
+Go to the root directory of the repository, and install the requirements in the virtual environment:
 ```
 pip install -r requirements.txt
 ```
@@ -300,7 +300,20 @@ Finally you can use the application to monitor, configure or validate the Bubble
 
 **Option 3: Deploy with Jupyter Notebook**
 
-To deploy with Jupyter Notebook, please ensure you have Jupyter Notebook setup and follow the steps mentioned in [this](./telco_planner_setup_notebook.ipynb) notebook.
+To deploy the project using Jupyter Notebook, ensure that Jupyter is installed and set up on your system.
+
+Navigate to a directory outside the cloned GitHub repository:
+```bash
+cd ..
+```
+
+Copy the notebook file to the current directory:
+
+```bash
+cp Telco-Network-Configuration/telco_planner_setup_notebook.ipynb ./telco_planner_setup_notebook.ipynb
+```
+
+Follow the instructions and execute the commands starting from Step 4 in the copied [setup notebook](./telco_planner_setup_notebook.ipynb).
 
 
 
