@@ -224,12 +224,11 @@ After you export the `NGC_API_KEY`, you have two options for accessing Llama-3.1
 To **deploy locally hosted NIMs** for Llama 3.1 70B Instruct, please follow the instructions on the [NVIDIA Build page for Llama-3.1-70b-instruct](https://build.nvidia.com/meta/llama-3_1-70b-instruct/deploy?environment=linux.md). Authenticate using your NGC API key, and be sure to update the necessary values in your `config.yaml` file — see the next step for configuration details.
 
 
-
 ### Step 2: Setup the blueprint repository
 
 Clone this repository in your system and navigate to the root of the directory:
 ```bash 
-git clone https://bubbleran.com/Telco-Network-Configuration
+git clone https://github.com/bubbleran/Telco-Network-Configuration.git
 ```
 
 Setup the following values in the `config.yaml` file:
@@ -459,8 +458,8 @@ The original (historical) data is based on gain values, subtract those from 90 o
 ## Important Links
 
 * [NVIDIA Agentic AI Blueprints](https://blogs.nvidia.com/blog/agentic-ai-blueprints/)
-* [Link to NVIDIA blog]()
-* [Link to NVIDIA Blueprint Page](https://build.nvidia.com/blueprints)
+* [Link to NVIDIA blog](https://blogs.nvidia.com/blog/ai-blueprint-telco-network-configuration/)
+* [Link to NVIDIA Blueprint Page](https://build.nvidia.com/nvidia/telco-network-configuration-recommender)
 * [Link to BubbleRAN Blog](https://bubbleran.com/news/ai-blueprint-telco/)
 * [Link to BubbleRAN 5G O-RAN Multi-X Platform Development Kit (MX-PDK)](https://bubbleran.com/products/mx-pdk/)
 * [Link to BubbleRAN Multi-X Automation and Intelligence Platform (MX-AI)](https://bubbleran.com/products/mx-ai)
