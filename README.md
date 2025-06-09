@@ -457,31 +457,17 @@ So the formula is: [Tx_gain = 90 - att_tx] and [Rx_gain = 70 - att_rx] for USRP 
 The original (historical) data is based on gain values, subtract those from 90 or 70, respectively, to get the corresponding attenuation values.
 
 ## Important Links
-TODO: add links
+
 * [NVIDIA Agentic AI Blueprints](https://blogs.nvidia.com/blog/agentic-ai-blueprints/)
-* [Link to blog]()
-* [Link to build.nvidia page]()
-* [Link to BubbleRAN Blog](https://bubbleran.com/news)
-* [Link to MX-PDK](https://bubbleran.com/products/mx-pdk/)
-* [Link to MX-AI](https://bubbleran.com/products/mx-ai)
-
-
-## Inviting the community to contribute
-
-We welcome contributions from the community and value your feedback, comments, and ideas.
-To contribute, please follow these steps:
-
-1. **Fork** this repository to your GitLab account.
-2. **Create a new feature branch** from the `main` branch.
-3. **Make your changes** with clear, concise commits. Remember to sign off the comment with `-s` flag. For example, `$ git commit -s -m "Add xyz feature"`
-4. **Submit a merge request (MR)** with a detailed description of your changes and any relevant context.
-
-
-Thank you for helping improve and spread this project!
+* [Link to NVIDIA blog]()
+* [Link to NVIDIA Blueprint Page](https://build.nvidia.com/blueprints)
+* [Link to BubbleRAN Blog](https://bubbleran.com/news/ai-blueprint-telco/)
+* [Link to BubbleRAN 5G O-RAN Multi-X Platform Development Kit (MX-PDK)](https://bubbleran.com/products/mx-pdk/)
+* [Link to BubbleRAN Multi-X Automation and Intelligence Platform (MX-AI)](https://bubbleran.com/products/mx-ai)
 
 ## License
 
-Please refer to [blueprint license](./LICENSE.md) and [BubbleRAN license](./LICENSE_BubbleRAN.md) for details.
+Please refer to [Blueprint License](./LICENSE.md) and [BubbleRAN License](./LICENSE_BubbleRAN.md) for details.
 
 ## Disclaimer
 
