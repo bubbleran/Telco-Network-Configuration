@@ -220,8 +220,28 @@ After you export the `NGC_API_KEY`, you have two options for accessing Llama-3.1
 
 * **Host NVIDIA NIM Locally** — run NVIDIA NIM directly on your own GPU-equipped machines for improved latency and maintain full control over your infrastructure.
 
-To **deploy locally hosted NIMs** for Llama 3.1 70B Instruct, please follow the instructions on the [NVIDIA Build page for Llama-3.1-70b-instruct](https://build.nvidia.com/meta/llama-3_1-70b-instruct/deploy?environment=linux.md). Authenticate using your NGC API key, and be sure to update the necessary values in your `config.yaml` file — see the next step for configuration details.
+Run the commands below **only if you want to deploy locally hosted NIMs** for Llama 3.1 70B Instruct. If you want to use API Catalog endpoints, please proceed to Step 2.
 
+
+```bash
+$ docker login nvcr.io
+# Username: $oauthtoken
+# Password: <YOUR_NVIDIA_API_KEY>
+```
+
+```bash
+export LOCAL_NIM_CACHE=~/.cache/nim
+mkdir -p "$LOCAL_NIM_CACHE"
+docker run -it --rm \
+    --gpus all \
+    --shm-size=16GB \
+    -e NGC_API_KEY \
+    -v "$LOCAL_NIM_CACHE:/opt/nim/.cache" \
+    -u $(id -u) \
+    -p 8000:8000 \
+    nvcr.io/nim/meta/llama-3.1-70b-instruct:latest
+```
+For more details, please see [NVIDIA Build page for Llama-3.1-70b-instruct](https://build.nvidia.com/meta/llama-3_1-70b-instruct/deploy?environment=linux.md). Be sure to update the necessary values in your `config.yaml` file — see Step 2 for configuration details.
 
 ### Step 2: Setup the blueprint repository
 
@@ -310,7 +330,7 @@ cd ..
 Copy the notebook file to the current directory:
 
 ```bash
-cp Telco-Network-Configuration/telco_planner_setup_notebook.ipynb ./telco_planner_setup_notebook.ipynb
+mv Telco-Network-Configuration/telco_planner_setup_notebook.ipynb ./telco_planner_setup_notebook.ipynb
 ```
 
 Follow the instructions and execute the commands starting from Step 4 in the copied [setup notebook](./telco_planner_setup_notebook.ipynb).
