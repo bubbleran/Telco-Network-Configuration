@@ -12,7 +12,7 @@ The agents can also orchestrate changes across multiple layers (from PHY/MAC to 
 
 ## Watch the Video Demo
 
-[![Telco Network Blueprint Demo](images/Telco-AI-Blueprint.png)](https://youtu.be/-SqhpvAPHYQ)
+[![Telco Network Blueprint Demo](images/Telco-AI-Blueprint.png)](https://youtu.be/H5T6tkLCfTQ)
 
 
 ## Table of Contents
