@@ -491,12 +491,12 @@ The original (historical) data is based on gain values, subtract those from 90 o
 
 ## Important Links
 
-* [NVIDIA Agentic AI Blueprints](https://blogs.nvidia.com/blog/agentic-ai-blueprints/)
-* [Link to NVIDIA blog](https://blogs.nvidia.com/blog/ai-blueprint-telco-network-configuration/)
 * [Link to NVIDIA Blueprint Page](https://build.nvidia.com/nvidia/telco-network-configuration-recommender)
-* [Link to BubbleRAN Blog](https://bubbleran.com/news/ai-blueprint-telco/)
-* [Link to BubbleRAN 5G O-RAN Multi-X Platform Development Kit (MX-PDK)](https://bubbleran.com/products/mx-pdk/)
-* [Link to BubbleRAN Multi-X Automation and Intelligence Platform (MX-AI)](https://bubbleran.com/products/mx-ai)
+* [Link to BubbleRAN Blueprint Blog](https://bubbleran.com/news/ai-blueprint-telco/)
+* [Link to NVIDIA Blueprint Blog](https://blogs.nvidia.com/blog/ai-blueprint-telco-network-configuration/)
+* [Link to BubbleRAN 5G O-RAN Solution (MX-PDK)](https://bubbleran.com/products/mx-pdk/)
+* [Link to BubbleRAN AI Entreprise Solution (MX-AI)](https://bubbleran.com/products/mx-ai)
+* [NVIDIA Agentic AI Blueprint Description](https://blogs.nvidia.com/blog/agentic-ai-blueprints/)
 
 ## License
 
