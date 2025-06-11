@@ -8,10 +8,11 @@ In a telecom network, configuration and optimization involve managing a complex 
 
 NVIDIA has developed an **agentic AI blueprint**, built on the top of the BubbleRAN 5G O-RAN network, to bring autonomy into dynamic wireless environment. By observing real-time statistics (e.g., SNR, MCS or LDPC decoder iterations) and the resulting KPIs (such as DL/UL bitrate), the agents can make data-driven decisions and automatically adjust the configuration parameters. Unlike traditional rule-based SON, this agentic AI solution is capable of reasoning through complex trade-offs (e.g., higher downlink bitrate vs. SNR degradation), learning from feedback loops[*](#upcoming-features), and adapting to evolving conditions—either autonomously, without human intervention, or with manual oversight, depending on the use case.
 
-
-
 The agents can also orchestrate changes across multiple layers (from PHY/MAC to RRC/NGAP) and multiple vendors, enabling coordinated actions like load balancing, inter-cell interference coordination, or power saving in underutilized areas. This level of autonomous control results in improved spectrum efficiency, higher quality of service, and significantly reduced operational complexity and time-to-resolution — especially critical in dense, high-demand RAN environments.
 
+## Watch the Video Demo
+
+[![Telco Network Blueprint Demo](images/Telco-AI-Blueprint.png)](https://youtu.be/-SqhpvAPHYQ)
 
 
 ## Table of Contents
